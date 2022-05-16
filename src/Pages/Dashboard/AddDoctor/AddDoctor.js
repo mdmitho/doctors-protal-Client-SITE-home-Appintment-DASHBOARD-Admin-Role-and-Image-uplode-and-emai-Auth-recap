@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { useQuery } from 'react-query';
 import Loading from '../../Shared/Loading'
 
@@ -8,6 +9,7 @@ const AddDoctor = () => {
     register,
     formState: { errors },
     handleSubmit,
+    reset,
   } = useForm();
 
   const { data: services, isLoading } = useQuery("services", () =>
@@ -21,7 +23,7 @@ const AddDoctor = () => {
   }
 
   const onSubmit = async (data) => {
-    console.log("date ", data);
+   
     const image = data.image[0]
     const formData = new FormData();
     formData.append("image",image);
@@ -41,10 +43,34 @@ fetch(url, {
         img:img
       }
 // send to your database
+fetch("http://localhost:5000/doctor",{
+  method:'POST',
+  headers:{
+    'content-type':'application/json',
+    authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+  },
+  body:JSON.stringify(doctor)
+})
+.then(res => res.json())
+.then(inserted => {
 
+if (inserted.insertedId){
+  toast.success('Doctor added successfully')
+  reset()
+}
+else{
+  toast.error('Failed to add the doctor')
+}
+
+
+
+
+
+// console.log("doctor inserted", inserted);
+})
 
     }
-    console.log("imgbb:", result);
+    // console.log("imgbb:", result);
   });
 
   };
